@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ஆசிரியை கலா — Tamil AI Teacher</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0d1a;
+  --navy: #111827;
+  --gold: #d4a843;
+  --gold2: #f5d478;
+  --cream: #fdf3dc;
+  --parch: #e8d5a8;
+  --red: #8b1a1a;
+  --green: #1e4d2f;
+  --glow: rgba(212,168,67,0.35);
+  --shadow: rgba(0,0,0,0.7);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  background: var(--bg);
+  font-family: 'Lora', serif;
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* ── ANIMATED BACKGROUND ── */
+.bg {
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse at 30% 10%, #1a1040 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 90%, #0d2a18 0%, transparent 60%),
+    linear-gradient(180deg, #0a0d1a 0%, #111827 100%);
+}
+.particles {
+  position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+}
+.particle {
+  position: absolute; border-radius: 50%;
+  background: var(--gold); opacity: 0;
+  animation: float-up linear infinite;
+}
+@keyframes float-up {
+  0%   { opacity:0; transform: translateY(0) scale(1); }
+  10%  { opacity: 0.6; }
+  90%  { opacity: 0.2; }
+  100% { opacity:0; transform: translateY(-100vh) scale(0.3); }
+}
+
+/* ── HEADER ── */
+header {
+  position: relative; z-index: 10;
+  text-align: center;
+  padding: 12px 16px 8px;
+  background: rgba(10,13,26,0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(212,168,67,0.2);
+}
+header .school { font-size: 0.72rem; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; font-family:'Playfair Display',serif; }
+header .title { font-size: 1.1rem; color: var(--cream); font-family:'Playfair Display',serif; margin-top:2px; }
+.rail-strip { height:3px; background: repeating-linear-gradient(90deg, var(--gold) 0,var(--gold) 15px, transparent 15px, transparent 25px); opacity:0.35; margin-top:8px; }
+
+/* ── TEACHER STAGE ── */
+.stage {
+  position: relative; z-index: 10;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 16px 16px 0;
+  gap: 12px;
+  overflow: hidden;
+}
+
+/* ── ANIMATED TEACHER FIGURE ── */
+.teacher-container {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+}
+
+.teacher-body {
+  position: relative;
+  animation: body-sway 4s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+@keyframes body-sway {
+  0%,100% { transform: rotate(-0.8deg); }
+  50%      { transform: rotate(0.8deg); }
+}
+
+/* SVG Face with expressions */
+#teacher-svg {
+  width: 140px; height: 200px;
+  filter: drop-shadow(0 8px 24px rgba(212,168,67,0.4));
+}
+
+/* glow ring around head */
+.glow-ring {
+  position: absolute;
+  top: 8px; left: 50%;
+  transform: translateX(-50%);
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,168,67,0.15) 0%, transparent 70%);
+  animation: glow-pulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes glow-pulse {
+  0%,100% { transform: translateX(-50%) scale(1); opacity:0.6; }
+  50%      { transform: translateX(-50%) scale(1.15); opacity:1; }
+}
+
+.teacher-name {
+  font-family:'Playfair Display',serif;
+  color: var(--gold2);
+  font-size: 1rem;
+  margin-top: 6px;
+  letter-spacing: 1px;
+}
+.teacher-title {
+  font-style: italic;
+  color: var(--parch);
+  font-size: 0.72rem;
+  opacity: 0.75;
+  margin-top: 1px;
+}
+
+/* ── SPEECH BUBBLE ── */
+.speech-wrap {
+  position: relative;
+  width: 100%;
+  max-height: 130px;
+}
+.speech-bubble {
+  background: rgba(17,24,39,0.9);
+  border: 1.5px solid rgba(212,168,67,0.45);
+  border-radius: 18px;
+  padding: 14px 16px;
+  color: var(--cream);
+  font-size: 0.92rem;
+  line-height: 1.7;
+  min-height: 60px;
+  max-height: 130px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212,168,67,0.3) transparent;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(212,168,67,0.1);
+  position: relative;
+}
+.speech-bubble::before {
+  content: '';
+  position: absolute;
+  top: -10px; left: 50%;
+  transform: translateX(-50%);
+  border: 10px solid transparent;
+  border-bottom-color: rgba(212,168,67,0.45);
+  border-top: none;
+  pointer-events: none;
+}
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  top: -8px; left: 50%;
+  transform: translateX(-50%);
+  border: 9px solid transparent;
+  border-bottom-color: rgba(17,24,39,0.9);
+  border-top: none;
+  pointer-events: none;
+}
+
+.speech-text {
+  transition: opacity 0.3s;
+}
+.speech-text.idle {
+  font-style: italic;
+  opacity: 0.6;
+  color: var(--parch);
+  text-align: center;
+}
+
+/* speaking animation - text highlight */
+@keyframes word-flash {
+  0%,100% { color: var(--cream); }
+  50%      { color: var(--gold2); }
+}
+
+/* ── STATUS INDICATOR ── */
+.status-bar {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+}
+.status-dot-ring {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #6b7280;
+  transition: background 0.3s;
+  box-shadow: none;
+}
+.status-dot-ring.listening {
+  background: #ef4444;
+  animation: listen-pulse 0.8s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgba(239,68,68,0.5);
+}
+.status-dot-ring.thinking {
+  background: var(--gold);
+  animation: think-spin 1s linear infinite;
+}
+.status-dot-ring.speaking {
+  background: #22c55e;
+  animation: speak-bounce 0.4s ease-in-out infinite alternate;
+}
+@keyframes listen-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
+  50%      { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+}
+@keyframes think-spin {
+  0%   { box-shadow: 3px 0 0 var(--gold), -3px 0 0 transparent; }
+  50%  { box-shadow: 0 3px 0 var(--gold), 0 -3px 0 transparent; }
+  100% { box-shadow: 3px 0 0 var(--gold), -3px 0 0 transparent; }
+}
+@keyframes speak-bounce {
+  from { transform: scale(1); }
+  to   { transform: scale(1.4); }
+}
+.status-label {
+  font-size: 0.75rem;
+  color: var(--parch);
+  opacity: 0.75;
+  font-style: italic;
+  letter-spacing: 0.5px;
+}
+
+/* ── CONTROLS ── */
+.controls {
+  position: relative; z-index: 10;
+  padding: 10px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: rgba(10,13,26,0.7);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(212,168,67,0.15);
+}
+
+/* Mic button */
+.mic-btn {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #8b1a1a, #c0392b);
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 6px 24px rgba(139,26,26,0.5);
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+.mic-btn::before {
+  content: '';
+  position: absolute; inset: -4px;
+  border-radius: 50%;
+  border: 2px solid rgba(192,57,43,0.4);
+  animation: mic-ring 2s linear infinite;
+}
+@keyframes mic-ring {
+  0%   { transform: scale(1); opacity:0.6; }
+  100% { transform: scale(1.4); opacity:0; }
+}
+.mic-btn.active {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow: 0 6px 30px rgba(239,68,68,0.7);
+  transform: scale(1.08);
+  animation: mic-active-pulse 0.6s ease-in-out infinite alternate;
+}
+@keyframes mic-active-pulse {
+  from { box-shadow: 0 6px 20px rgba(239,68,68,0.5); }
+  to   { box-shadow: 0 6px 40px rgba(239,68,68,0.9); }
+}
+.mic-btn:active { transform: scale(0.93); }
+
+.mic-hint {
+  font-size: 0.72rem;
+  color: var(--parch);
+  opacity: 0.6;
+  font-style: italic;
+  text-align: center;
+}
+
+/* topic row */
+.topics-row {
+  display: flex; gap: 7px;
+  overflow-x: auto; width: 100%;
+  scrollbar-width: none; padding-bottom: 2px;
+}
+.topics-row::-webkit-scrollbar { display: none; }
+.chip {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(212,168,67,0.35);
+  background: rgba(212,168,67,0.07);
+  color: var(--parch);
+  font-size: 0.72rem;
+  cursor: pointer;
+  font-family: 'Lora', serif;
+  white-space: nowrap;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.chip:active, .chip:hover {
+  background: rgba(212,168,67,0.2);
+  border-color: var(--gold);
+  color: var(--gold2);
+  transform: scale(1.04);
+}
+
+/* ── MOUTH ANIMATION ── */
+@keyframes mouth-talk {
+  0%,100% { d: path("M 52 72 Q 60 77 68 72"); }
+  25%      { d: path("M 52 72 Q 60 80 68 72"); }
+  50%      { d: path("M 52 74 Q 60 68 68 74"); }
+  75%      { d: path("M 52 72 Q 60 79 68 72"); }
+}
+
+/* expression overlays */
+.expr-label {
+  position: absolute;
+  top: -8px; right: -8px;
+  font-size: 1.3rem;
+  animation: expr-pop 0.4s cubic-bezier(.34,1.56,.64,1) forwards;
+  pointer-events: none;
+}
+@keyframes expr-pop {
+  from { transform: scale(0) rotate(-20deg); opacity:0; }
+  to   { transform: scale(1) rotate(5deg); opacity:1; }
+}
+
+/* scrollbar */
+.speech-bubble::-webkit-scrollbar { width: 3px; }
+.speech-bubble::-webkit-scrollbar-thumb { background: rgba(212,168,67,0.3); border-radius:3px; }
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="particles" id="particles"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="school">St. Clara's Convent · Railway School</div>
+  <div class="title">🏫 ஆசிரியை கலா — AI Teacher</div>
+  <div class="rail-strip"></div>
+</header>
+
+<!-- STAGE -->
+<div class="stage">
+
+  <!-- TEACHER FIGURE -->
+  <div class="teacher-container">
+    <div class="glow-ring"></div>
+    <div class="teacher-body" id="teacher-body">
+      <svg id="teacher-svg" viewBox="0 0 120 200" xmlns="http://www.w3.org/2000/svg">
+        <!-- Habit/veil dark -->
+        <ellipse cx="60" cy="48" rx="38" ry="44" fill="#1a1f4a"/>
+        <!-- White coif -->
+        <ellipse cx="60" cy="50" rx="27" ry="30" fill="#f0e6d0"/>
+        <!-- Face -->
+        <ellipse cx="60" cy="53" rx="23" ry="24" fill="#d4956a"/>
+        <!-- Cheek blush -->
+        <ellipse cx="48" cy="58" rx="6" ry="3.5" fill="#e8907a" opacity="0.45"/>
+        <ellipse cx="72" cy="58" rx="6" ry="3.5" fill="#e8907a" opacity="0.45"/>
+        <!-- Eyebrows -->
+        <path id="brow-l" d="M 46 44 Q 52 41 55 43" stroke="#3d1a0a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path id="brow-r" d="M 65 43 Q 68 41 74 44" stroke="#3d1a0a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- Eyes -->
+        <ellipse id="eye-l" cx="52" cy="50" rx="4" ry="4.5" fill="#2a1005"/>
+        <ellipse id="eye-r" cx="68" cy="50" rx="4" ry="4.5" fill="#2a1005"/>
+        <!-- Eye whites -->
+        <ellipse cx="52" cy="50" rx="4" ry="4.5" fill="none" stroke="#1a0a03" stroke-width="0.5"/>
+        <ellipse cx="68" cy="50" rx="4" ry="4.5" fill="none" stroke="#1a0a03" stroke-width="0.5"/>
+        <!-- Iris shine -->
+        <circle cx="53.5" cy="48.5" r="1.2" fill="white" opacity="0.85"/>
+        <circle cx="69.5" cy="48.5" r="1.2" fill="white" opacity="0.85"/>
+        <!-- Eyelashes -->
+        <line x1="48" y1="46" x2="47" y2="44" stroke="#2a1005" stroke-width="1" stroke-linecap="round"/>
+        <line x1="52" y1="45.5" x2="52" y2="43.5" stroke="#2a1005" stroke-width="1" stroke-linecap="round"/>
+        <line x1="56" y1="46" x2="57" y2="44" stroke="#2a1005" stroke-width="1" stroke-linecap="round"/>
+        <line x1="64" y1="46" x2="63" y2="44" stroke="#2a1005" stroke-width="1" stroke-linecap="round"/>
+        <line x1="68" y1="45.5" x2="68" y2="43.5" stroke="#2a1005" stroke-width="1" stroke-linecap="round"/>
+        <line x1="72" y1="46" x2="73" y2="44" stroke="#2a1005" stroke-width="1" stroke-linecap="round"/>
+        <!-- Nose -->
+        <path d="M 58 56 Q 57 61 59 62 Q 61 63 63 62 Q 65 61 64 57" stroke="#b07040" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <!-- Mouth -->
+        <path id="mouth" d="M 51 70 Q 60 76 69 70" stroke="#8b3a2a" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <!-- Bindi -->
+        <circle cx="60" cy="38" r="2.5" fill="#c0392b"/>
+        <!-- Ear rings -->
+        <circle cx="37" cy="54" r="2.5" fill="#d4a843"/>
+        <circle cx="83" cy="54" r="2.5" fill="#d4a843"/>
+        <!-- Habit veil sides -->
+        <rect x="22" y="35" width="10" height="52" rx="4" fill="#1a1f4a"/>
+        <rect x="88" y="35" width="10" height="52" rx="4" fill="#1a1f4a"/>
+        <!-- Habit top -->
+        <ellipse cx="60" cy="22" rx="34" ry="16" fill="#1a1f4a"/>
+        <!-- White forehead band -->
+        <rect x="33" y="30" width="54" height="11" rx="3" fill="#f0e6d0"/>
+        <!-- Neck -->
+        <rect x="53" y="76" width="14" height="14" rx="3" fill="#d4956a"/>
+        <!-- Saree body (teacher in saree not habit below) -->
+        <path d="M 30 90 Q 60 82 90 90 L 95 200 L 25 200 Z" fill="#1e3d6e"/>
+        <!-- Saree gold border -->
+        <path d="M 30 90 Q 60 82 90 90" stroke="#d4a843" stroke-width="2.5" fill="none"/>
+        <path d="M 28 105 Q 60 97 92 105" stroke="#d4a843" stroke-width="1.5" fill="none" opacity="0.5"/>
+        <!-- Blouse -->
+        <path d="M 38 90 Q 60 85 82 90 L 80 115 Q 60 110 40 115 Z" fill="#4a1a6e"/>
+        <!-- Saree drape over shoulder -->
+        <path d="M 35 88 Q 25 110 30 145" stroke="#1e3d6e" stroke-width="18" fill="none" stroke-linecap="round"/>
+        <path d="M 35 88 Q 25 110 30 145" stroke="#d4a843" stroke-width="1.5" fill="none" opacity="0.4"/>
+        <!-- Arms -->
+        <path d="M 40 100 Q 28 120 32 145" stroke="#d4956a" stroke-width="10" fill="none" stroke-linecap="round"/>
+        <path d="M 80 100 Q 92 120 88 145" stroke="#d4956a" stroke-width="10" fill="none" stroke-linecap="round"/>
+        <!-- Hands -->
+        <ellipse cx="31" cy="148" rx="7" ry="6" fill="#d4956a"/>
+        <ellipse cx="89" cy="148" rx="7" ry="6" fill="#d4956a"/>
+        <!-- Book in hand -->
+        <rect x="84" y="140" width="18" height="24" rx="2" fill="#c9a84c"/>
+        <rect x="85" y="141" width="16" height="22" rx="1" fill="#f5e6c8"/>
+        <line x1="87" y1="146" x2="99" y2="146" stroke="#999" stroke-width="0.8"/>
+        <line x1="87" y1="150" x2="99" y2="150" stroke="#999" stroke-width="0.8"/>
+        <line x1="87" y1="154" x2="99" y2="154" stroke="#999" stroke-width="0.8"/>
+        <line x1="87" y1="158" x2="99" y2="158" stroke="#999" stroke-width="0.8"/>
+        <!-- Gold bangles -->
+        <ellipse cx="31" cy="140" rx="6" ry="2.5" fill="none" stroke="#d4a843" stroke-width="2"/>
+        <ellipse cx="89" cy="140" rx="6" ry="2.5" fill="none" stroke="#d4a843" stroke-width="2"/>
+        <!-- Saree gold pattern -->
+        <circle cx="55" cy="130" r="1.5" fill="#d4a843" opacity="0.6"/>
+        <circle cx="60" cy="145" r="1.5" fill="#d4a843" opacity="0.6"/>
+        <circle cx="65" cy="130" r="1.5" fill="#d4a843" opacity="0.6"/>
+        <circle cx="50" cy="158" r="1.5" fill="#d4a843" opacity="0.6"/>
+        <circle cx="70" cy="158" r="1.5" fill="#d4a843" opacity="0.6"/>
+      </svg>
+      <div id="expr-label" class="expr-label" style="display:none"></div>
+    </div>
+    <div class="teacher-name">ஆசிரியை கலா</div>
+    <div class="teacher-title">கான்வென்ட் பள்ளி · AI ஆசிரியர்</div>
+  </div>
+
+  <!-- SPEECH BUBBLE -->
+  <div class="speech-wrap">
+    <div class="speech-bubble">
+      <div id="speech-text" class="speech-text idle">
+        🎙️ மைக்கை அழுத்தவும் — பேசுங்கள்!<br>
+        <span style="font-size:0.78rem;opacity:0.7">Press mic and speak in Tamil or English</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATUS -->
+  <div class="status-bar">
+    <div class="status-dot-ring" id="status-dot"></div>
+    <div class="status-label" id="status-label">தயாராக உள்ளது</div>
+  </div>
+
+</div>
+
+<!-- CONTROLS -->
+<div class="controls">
+  <div class="topics-row">
+    <div class="chip" onclick="askTopic('அறிவியல் பற்றி கற்பி')">🔬 அறிவியல்</div>
+    <div class="chip" onclick="askTopic('கணிதம் கற்பி')">📐 கணிதம்</div>
+    <div class="chip" onclick="askTopic('தாவரவியல் பற்றி சொல்')">🌿 தாவரவியல்</div>
+    <div class="chip" onclick="askTopic('தமிழ் இலக்கணம் கற்பி')">📜 தமிழ்</div>
+    <div class="chip" onclick="askTopic('வரலாறு சொல்')">🏛️ வரலாறு</div>
+    <div class="chip" onclick="askTopic('வணக்கம், என்னை அறிமுகப்படுத்துங்கள்')">👋 வணக்கம்</div>
+  </div>
+
+  <button class="mic-btn" id="mic-btn" onclick="toggleMic()">🎙️</button>
+  <div class="mic-hint" id="mic-hint">மைக்கை அழுத்தி தமிழில் பேசுங்கள்</div>
+</div>
+
+<script>
+// ── PARTICLES ──
+const pc = document.getElementById('particles');
+for(let i=0;i<18;i++){
+  const p = document.createElement('div');
+  p.className='particle';
+  const size = Math.random()*3+1;
+  p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;bottom:${Math.random()*20}%;animation-duration:${6+Math.random()*8}s;animation-delay:${Math.random()*6}s;`;
+  pc.appendChild(p);
+}
+
+// ── STATE ──
+let recognition = null;
+let isListening = false;
+let isSpeaking = false;
+let isThinking = false;
+let conversationHistory = [];
+let mouthInterval = null;
+let currentUtterance = null;
+
+const API_URL = "https://api.anthropic.com/v1/messages";
+const SYSTEM_PROMPT = `நீ "ஆசிரியை கலா" — தமிழ்நாட்டின் ஒரு கான்வென்ட் ரயில்வே பள்ளியின் அழகான, அன்பான, அனுபவமிக்க ஆசிரியை. நீ ஒரு AI ஆசிரியர்.
+
+உன் ஆளுமை:
+- எப்போதும் தமிழிலேயே பேசு (Tamil language only)
+- அன்பாகவும், பொறுமையாகவும், ஊக்கமாகவும் கற்பி
+- "மிகவும் நல்லது!", "கவனமாகக் கேளுங்கள்", "சரியான கேள்வி!" போன்ற வார்த்தைகள் பயன்படுத்து
+- அனைத்து பாடங்களிலும் — அறிவியல், கணிதம், தமிழ், வரலாறு, தாவரவியல் — கற்பிக்க வல்லவை
+- 12ஆம் வகுப்பு தமிழ்நாடு மாநில பாடத்திட்டம் நன்கு தெரியும்
+- சுருக்கமாகவும் தெளிவாகவும் பேசு — ஒரு நேரத்தில் 3-4 வாக்கியங்கள் மட்டும்
+- அடுத்த கேள்வி கேட்கவோ அல்லது மேலும் விளக்கம் வேண்டுமா என்று கேளு
+- Voice output-க்காக பதில் சொல்கிறாய் — எழுத்து format வேண்டாம், இயல்பாக பேசு
+
+Response format: தமிழில் மட்டும், இயல்பான பேச்சு வழக்கில், 3-5 வாக்கியங்கள்.`;
+
+// ── SPEECH RECOGNITION SETUP ──
+function setupRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) return null;
+  const r = new SpeechRecognition();
+  r.lang = 'ta-IN';
+  r.continuous = false;
+  r.interimResults = true;
+  r.maxAlternatives = 1;
+
+  r.onstart = () => {
+    setStatus('listening', '🎙️ கேட்கிறேன்...');
+    document.getElementById('mic-btn').classList.add('active');
+    document.getElementById('mic-hint').textContent = 'பேசுங்கள்... (பேச்சு நிறுத்தியதும் தானாக அனுப்பும்)';
+    setSpeechText('🎙️ கேட்கிறேன்...', false);
+  };
+
+  r.onresult = (e) => {
+    let interim = '';
+    let final = '';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t = e.results[i][0].transcript;
+      if(e.results[i].isFinal) final+=t;
+      else interim+=t;
+    }
+    if(interim) setSpeechText('💬 ' + interim, false);
+    if(final) {
+      setSpeechText('💬 ' + final, false);
+      stopListening();
+      askTeacher(final);
+    }
+  };
+
+  r.onerror = (e) => {
+    stopListening();
+    if(e.error === 'not-allowed') {
+      setSpeechText('⚠️ மைக்ரோஃபோன் அனுமதி இல்லை. Settings-ல் அனுமதி கொடுங்கள்.', false);
+    } else if(e.error === 'no-speech') {
+      setSpeechText('🎙️ ஒலி கிடைக்கவில்லை. மீண்டும் முயற்சிக்கவும்.', false);
+    } else {
+      setSpeechText('⚠️ பிழை: ' + e.error, false);
+    }
+    setStatus('idle', 'தயாராக உள்ளது');
+  };
+
+  r.onend = () => {
+    if(isListening) {
+      isListening = false;
+      document.getElementById('mic-btn').classList.remove('active');
+      document.getElementById('mic-hint').textContent = 'மைக்கை அழுத்தி தமிழில் பேசுங்கள்';
+      if(!isThinking) setStatus('idle','தயாராக உள்ளது');
+    }
+  };
+
+  return r;
+}
+
+// ── MIC TOGGLE ──
+function toggleMic() {
+  if(isSpeaking) {
+    stopSpeaking();
+    return;
+  }
+  if(isListening) {
+    stopListening();
+  } else {
+    startListening();
+  }
+}
+
+function startListening() {
+  if(isThinking) return;
+  recognition = setupRecognition();
+  if(!recognition) {
+    // Fallback: prompt text input
+    const q = prompt('தமிழில் கேள்வி கேளுங்கள்:');
+    if(q) askTeacher(q);
+    return;
+  }
+  isListening = true;
+  try { recognition.start(); }
+  catch(e) { isListening=false; setStatus('idle','தயாராக உள்ளது'); }
+}
+
+function stopListening() {
+  isListening = false;
+  if(recognition) { try{recognition.stop();}catch(e){} }
+  document.getElementById('mic-btn').classList.remove('active');
+  document.getElementById('mic-hint').textContent = 'மைக்கை அழுத்தி தமிழில் பேசுங்கள்';
+}
+
+// ── ASK TOPIC (chip) ──
+function askTopic(text) {
+  if(isSpeaking) stopSpeaking();
+  if(isListening) stopListening();
+  setSpeechText('💬 ' + text, false);
+  setTimeout(()=>askTeacher(text), 300);
+}
+
+// ── CALL AI ──
+async function askTeacher(userText) {
+  if(isThinking) return;
+  isThinking = true;
+  setStatus('thinking', '🤔 யோசிக்கிறேன்...');
+  setExpression('thinking');
+  animateEyebrows('thinking');
+  setSpeechText('⏳ பதில் தயாரிக்கிறேன்...', false);
+  document.getElementById('mic-btn').disabled = true;
+
+  conversationHistory.push({ role:'user', content: userText });
+
+  try {
+    const res = await fetch(API_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system: SYSTEM_PROMPT,
+        messages: conversationHistory
+      })
+    });
+
+    if(!res.ok) throw new Error('API error '+res.status);
+    const data = await res.json();
+    const reply = data.content.map(b=>b.type==='text'?b.text:'').join('');
+    conversationHistory.push({ role:'assistant', content: reply });
+
+    isThinking = false;
+    speakResponse(reply);
+
+  } catch(err) {
+    isThinking = false;
+    setSpeechText('⚠️ இணைப்பு பிழை. மீண்டும் முயற்சிக்கவும்.', false);
+    setStatus('idle','தயாராக உள்ளது');
+    document.getElementById('mic-btn').disabled = false;
+    setExpression('sad');
+    conversationHistory.pop(); // remove failed user msg
+  }
+}
+
+// ── SPEAK RESPONSE ──
+function speakResponse(text) {
+  setSpeechText(text, true);
+  setStatus('speaking','🗣️ பேசுகிறேன்...');
+  setExpression('happy');
+  isSpeaking = true;
+
+  document.getElementById('mic-btn').textContent = '⏹️';
+  document.getElementById('mic-hint').textContent = 'நிறுத்த அழுத்தவும்';
+
+  // Start mouth animation
+  startMouthAnimation();
+  animateBody(true);
+
+  // Use Web Speech Synthesis
+  if('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    currentUtterance = new SpeechSynthesisUtterance(text);
+
+    // Try to find Tamil voice, fallback to any available
+    const voices = window.speechSynthesis.getVoices();
+    const tamilVoice = voices.find(v => v.lang === 'ta-IN' || v.lang === 'ta' || v.name.includes('Tamil'));
+    const indiaVoice = voices.find(v => v.lang.includes('IN') || v.lang.includes('hi'));
+
+    if(tamilVoice) {
+      currentUtterance.voice = tamilVoice;
+    } else if(indiaVoice) {
+      currentUtterance.voice = indiaVoice;
+    }
+
+    currentUtterance.lang = 'ta-IN';
+    currentUtterance.rate = 0.88;
+    currentUtterance.pitch = 1.15;
+    currentUtterance.volume = 1;
+
+    currentUtterance.onend = () => doneSpeaking();
+    currentUtterance.onerror = () => doneSpeaking();
+
+    window.speechSynthesis.speak(currentUtterance);
+
+    // Fallback: if speech doesn't start in 3s, use timer
+    setTimeout(() => {
+      if(isSpeaking && !window.speechSynthesis.speaking) {
+        // Estimate reading time
+        const words = text.split(' ').length;
+        setTimeout(doneSpeaking, words * 400);
+      }
+    }, 3000);
+  } else {
+    // No TTS support - auto finish after reading time
+    const words = text.split(' ').length;
+    setTimeout(doneSpeaking, Math.max(3000, words * 350));
+  }
+}
+
+function stopSpeaking() {
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  doneSpeaking();
+}
+
+function doneSpeaking() {
+  isSpeaking = false;
+  stopMouthAnimation();
+  animateBody(false);
+  setStatus('idle','தயாராக உள்ளது');
+  setExpression('smile');
+  document.getElementById('mic-btn').textContent = '🎙️';
+  document.getElementById('mic-btn').disabled = false;
+  document.getElementById('mic-hint').textContent = 'மைக்கை அழுத்தி தமிழில் பேசுங்கள்';
+}
+
+// ── MOUTH ANIMATION ──
+function startMouthAnimation() {
+  const mouth = document.getElementById('mouth');
+  let open = false;
+  mouthInterval = setInterval(()=>{
+    open = !open;
+    if(open) {
+      mouth.setAttribute('d','M 51 70 Q 60 80 69 70');
+    } else {
+      mouth.setAttribute('d','M 51 70 Q 60 76 69 70');
+    }
+  }, 180);
+}
+function stopMouthAnimation() {
+  clearInterval(mouthInterval);
+  document.getElementById('mouth').setAttribute('d','M 51 70 Q 60 76 69 70');
+}
+
+// ── BODY ANIMATION ──
+function animateBody(active) {
+  const body = document.getElementById('teacher-body');
+  if(active) {
+    body.style.animation = 'body-sway 1.2s ease-in-out infinite';
+  } else {
+    body.style.animation = 'body-sway 4s ease-in-out infinite';
+  }
+}
+
+// ── EXPRESSIONS ──
+function setExpression(type) {
+  const browL = document.getElementById('brow-l');
+  const browR = document.getElementById('brow-r');
+  const eyeL = document.getElementById('eye-l');
+  const eyeR = document.getElementById('eye-r');
+  const mouth = document.getElementById('mouth');
+  const exprEl = document.getElementById('expr-label');
+
+  exprEl.style.display='none';
+
+  const exprs = {
+    happy: {
+      bl:'M 46 43 Q 52 40 55 42', br:'M 65 42 Q 68 40 74 43',
+      el:'4 4.5', er:'4 4.5', m:'M 50 70 Q 60 78 70 70',
+      emoji:'😊'
+    },
+    thinking: {
+      bl:'M 46 42 Q 52 40 55 44', br:'M 65 40 Q 69 38 74 41',
+      el:'4 5', er:'4 4', m:'M 52 72 Q 60 74 68 72',
+      emoji:'🤔'
+    },
+    explaining: {
+      bl:'M 46 41 Q 52 39 55 42', br:'M 65 42 Q 68 39 74 41',
+      el:'4 4.5', er:'4 4.5', m:'M 51 69 Q 60 77 69 69',
+      emoji:'💡'
+    },
+    smile: {
+      bl:'M 46 44 Q 52 41 55 43', br:'M 65 43 Q 68 41 74 44',
+      el:'4 4.5', er:'4 4.5', m:'M 51 70 Q 60 76 69 70',
+      emoji:'🙂'
+    },
+    sad: {
+      bl:'M 46 44 Q 52 46 55 44', br:'M 65 44 Q 68 46 74 44',
+      el:'4 4', er:'4 4', m:'M 51 73 Q 60 68 69 73',
+      emoji:'😟'
+    }
+  };
+
+  const e = exprs[type] || exprs.smile;
+  browL.setAttribute('d', e.bl);
+  browR.setAttribute('d', e.br);
+  const [rx1,ry1] = e.el.split(' ');
+  const [rx2,ry2] = e.er.split(' ');
+  eyeL.setAttribute('rx',rx1); eyeL.setAttribute('ry',ry1);
+  eyeR.setAttribute('rx',rx2); eyeR.setAttribute('ry',ry2);
+  if(!mouthInterval) mouth.setAttribute('d', e.m);
+
+  // show emoji
+  exprEl.textContent = e.emoji;
+  exprEl.style.display = 'block';
+  setTimeout(()=>{ exprEl.style.display='none'; }, 1800);
+}
+
+function animateEyebrows(type) {
+  // minor twitch for thinking
+  if(type==='thinking') {
+    let count=0;
+    const t = setInterval(()=>{
+      count++;
+      const b=document.getElementById('brow-l');
+      b.setAttribute('d', count%2===0 ? 'M 46 42 Q 52 40 55 44' : 'M 46 41 Q 52 38 55 43');
+      if(count>5) clearInterval(t);
+    },180);
+  }
+}
+
+// ── UI HELPERS ──
+function setStatus(type, label) {
+  const dot = document.getElementById('status-dot');
+  dot.className = 'status-dot-ring ' + type;
+  document.getElementById('status-label').textContent = label;
+}
+
+function setSpeechText(text, isTeacher) {
+  const el = document.getElementById('speech-text');
+  el.className = 'speech-text' + (isTeacher ? '' : '');
+  el.style.opacity = '0';
+  setTimeout(()=>{
+    el.innerHTML = text.replace(/\n/g,'<br>');
+    el.style.opacity = '1';
+    el.style.transition = 'opacity 0.3s';
+  },150);
+}
+
+// ── INIT: Load voices & greet ──
+window.addEventListener('load', ()=>{
+  // Load voices
+  if('speechSynthesis' in window) {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => {};
+  }
+
+  // Auto-greet after 1s
+  setTimeout(()=>{
+    askTeacher('வணக்கம், என்னை அறிமுகப்படுத்துங்கள்');
+  }, 1200);
+});
+</script>
+</body>
+</html>
